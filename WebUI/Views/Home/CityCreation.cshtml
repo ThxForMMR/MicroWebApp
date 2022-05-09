@@ -1,0 +1,44 @@
+﻿@Html.DropDownList("AreaDropDownList", new SelectList(Enumerable.Empty<SelectListItem>()))
+@Html.DropDownList("DistrictDropDownList", new SelectList(Enumerable.Empty<SelectListItem>()))
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $select = $('#AreaDropDownList');
+        $.ajax({
+            type: "GET",
+            url: 'http://localhost:44346/api/area',
+            dataType: 'JSON',
+            success: function (data) {
+                $select.html('<option value="">Select area</option>');
+                $.each(data, function (key, val) {
+                    $select.append('<option value="' + val.id + '">' + val.areaName + '</option>');
+                })
+            },
+            error: function () {
+                $select.html('<option value="-2">Please try again...</option>');
+            });
+        //When user select any Brand below change event will callled.
+        $('#AreaDropDownList').change(function () {
+            var area_id = $(this).val();
+            getDistrict(area_id);
+        });
+
+        function getProducts(area_id) {
+            $select = $('#productDropdownList')
+            $select.html('<option value="">Please wait...</option>');
+            $.ajax({
+                type: "GET",
+                url: 'http://localhost:44346/api/district?id=' + area_id,
+                dataType: 'JSON',
+                success: function (data) {
+                    $select.html('');
+                    $.each(data, function (key, val) {
+                        $select.append('<option value="' + val.id + '">' + val.districtName + '</option>');
+                    })
+                },
+                error: function () {
+                    $select.html('<option value="-2">Please try again...</option>');
+                });
+        }
+    });
+</script>

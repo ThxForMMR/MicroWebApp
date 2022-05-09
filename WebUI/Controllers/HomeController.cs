@@ -6,9 +6,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WebUI.Models;
+using Microsoft.AspNetCore.Cors;
 
 namespace WebUI.Controllers
 {
+    [EnableCors("all")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -19,6 +21,11 @@ namespace WebUI.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult CityCreation()
         {
             return View();
         }
