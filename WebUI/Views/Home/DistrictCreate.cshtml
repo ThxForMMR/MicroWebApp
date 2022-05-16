@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Менеджер районов</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h2>Создание района</h2>
+    <form name="districtForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <label for="area">Область:</label>
+            <select class="form-control" name="area" id="1"></select>
+            <label for="name">Название:</label>
+            <input class="form-control" name="name" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+            <button type="reset" id="reset_btn" class="btn btn-primary">Сбросить</button>
+        </div>
+    </form>
+    <table id="data_table" class="table table-condensed table-striped  col-md-6">
+        <thead><tr><th>Id</th><th>Название</th><th></th></tr></thead>
+        <tbody id="tbody_data_table">
+        </tbody>
+    </table>
+    <script>
+        // Получение всех
+        async function GetAreas() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/area", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const areas = await response.json();
+                var selectArea = document.getElementById("1");
+
+                areas.forEach(area => {
+                    var option = document.createElement("option");
+                    option.text = area.areaName;
+                    option.value = area.id;
+                    selectArea.add(option);
+                });
+            }
+        }
+
+        // Получение районов области
+        async function GetDistrictByAreaId(id) {
+            const response = await fetch("/api/district/AreaId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const districts = await response.json();
+                let rows = document.querySelector("tbody");
+                districts.forEach(district => {
+                    // добавляем полученные элементы в таблицу
+                    rows.append(row(district));
+                });
+            }
+        }
+
+        // Получение одного района
+        async function GetDistrict(id) {
+            const response = await fetch("/api/district/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const district = await response.json();
+                const form = document.forms["districtForm"];
+                form.elements["id"].value = district.id;
+                form.elements["name"].value = district.districtName;
+            }
+        }
+        // Добавление
+        async function CreateDistrict(name, area_id) {
+            const response = await fetch("/api/district", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    districtName: name,
+                    areaId: area_id
+                })
+            });
+            if (response.ok === true) {
+                const district = await response.json();
+                reset();
+                document.querySelector("tbody").append(row(district));
+            }
+        }
+        // Изменение
+        async function EditDistrict(district_id, name, area_id) {
+            const response = await fetch("/api/district", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: parseInt(district_id, 10),
+                    districtName: name,
+                    areaId: area_id
+                })
+            });
+            if (response.ok === true) {
+                const district = await response.json();
+                reset();
+                document.querySelector("tr[data-rowid='" + district.id + "']").replaceWith(row(district));
+            }
+        }
+
+        // Удаление
+        async function DeleteDistrict(id) {
+            const response = await fetch("/api/district/" + id, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                document.querySelector("tr[data-rowid='" + id + "']").remove();
+            }
+        }
+        
+        // создание строки для таблицы
+        function row(district) {
+
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", district.id);
+
+            const idTd = document.createElement("td");
+            idTd.append(district.id);
+            tr.append(idTd);
+
+            const nameTd = document.createElement("td");
+            nameTd.append(district.districtName);
+            tr.append(nameTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", district.id);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                GetDistrict(district.id);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", district.id);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                DeleteDistrict(district.id);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+
+        // сброс формы
+        function reset() {
+            const form = document.forms["districtForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        // кнопка сброса значений формы
+        document.forms["districtForm"].addEventListener("reset_btn", e => {
+            e.preventDefault();
+            reset();
+            clearTable();
+        })
+
+        // отправка формы
+        document.forms["districtForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["districtForm"];
+            const id = form.elements["id"].value;
+            const name = form.elements["name"].value;
+            const area_id = form.elements["area"].value;
+            if (id == 0)
+                CreateDistrict(name, area_id);
+            else
+                EditDistrict(id, name, area_id);
+        });
+
+        // загрузка 
+        GetAreas();
+
+        //очистка таблицы
+        function clearTable() {
+            const table = document.getElementById("data_table");
+
+            const new_tbody = document.createElement('tbody');
+            new_tbody.setAttribute('id', "tbody_data_table");
+
+            const old_tbody = document.getElementById("tbody_data_table");
+            
+            table.replaceChild(new_tbody, old_tbody);
+        }
+
+        document.getElementById("1").addEventListener('change', (event) => {
+            clearTable();
+            GetDistrictByAreaId(event.target.value);
+        })
+
+    </script>
+</body>
+</html>

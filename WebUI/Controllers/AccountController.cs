@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using WebUI.Models;
 using WebUI.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Cors;
 
 namespace WebUI.Controllers
 {
-    [EnableCors("all")]
     public class AccountController : Controller
     {
         private readonly UserManager<User> _userManager;

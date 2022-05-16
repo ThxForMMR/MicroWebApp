@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Менеджер областей</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h2>Создание области</h2>
+    <form name="areaForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <label for="name">Название:</label>
+            <input class="form-control" name="name" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+            <button type="reset" id="reset_btn" class="btn btn-primary">Сбросить</button>
+        </div>
+    </form>
+    <table class="table table-condensed table-striped  col-md-6">
+        <thead><tr><th>Id</th><th>Название</th><th></th></tr></thead>
+        <tbody>
+        </tbody>
+    </table>
+    <script>
+        // Получение всех 
+        async function GetAreas() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/area", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const areas = await response.json();
+                let rows = document.querySelector("tbody");
+                areas.forEach(area => {
+                    // добавляем полученные элементы в таблицу
+                    rows.append(row(area));
+                });
+            }
+        }
+        // Получение одного 
+        async function GetArea(id) {
+            const response = await fetch("/api/area/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const area = await response.json();
+                const form = document.forms["areaForm"];
+                form.elements["id"].value = area.id;
+                form.elements["name"].value = area.areaName;
+            }
+        }
+        // Добавление 
+        async function CreateArea(Name) {
+            const response = await fetch("/api/area", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    areaName: Name
+                })
+            });
+            if (response.ok === true) {
+                const area = await response.json();
+                reset();
+                document.querySelector("tbody").append(row(area));
+            }
+        }
+        // Изменение 
+        async function EditArea(areaId, Name) {
+            const response = await fetch("/api/area", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: parseInt(areaId, 10),
+                    areaName: Name
+                })
+            });
+            if (response.ok === true) {
+                const area = await response.json();
+                reset();
+                document.querySelector("tr[data-rowid='" + area.id + "']").replaceWith(row(area));
+            }
+        }
+        // Удаление 
+        async function DeleteArea(id) {
+            const response = await fetch("/api/area/" + id, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                document.querySelector("tr[data-rowid='" + id + "']").remove();
+            }
+        }
+
+        // сброс формы
+        function reset() {
+            const form = document.forms["areaForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+        // создание строки для таблицы
+        function row(area) {
+
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", area.id);
+
+            const idTd = document.createElement("td");
+            idTd.append(area.id);
+            tr.append(idTd);
+
+            const nameTd = document.createElement("td");
+            nameTd.append(area.areaName);
+            tr.append(nameTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", area.id);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                GetArea(area.id);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", area.id);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                DeleteArea(area.id);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+
+        // сброс значений формы
+        document.forms["areaForm"].addEventListener("reset_btn", e => {
+            e.preventDefault();
+            reset();
+        })
+
+        // отправка формы
+        document.forms["areaForm"].addEventListener("submit", e => {
+            e.preventDefault();
+            const form = document.forms["areaForm"];
+            const id = form.elements["id"].value;
+            const name = form.elements["name"].value;
+            if (id == 0)
+                CreateArea(name);
+            else
+                EditArea(id, name);
+        });
+
+        // загрузка пользователей
+        GetAreas();
+
+    </script>
+</body>
+</html>

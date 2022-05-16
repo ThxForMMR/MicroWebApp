@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WebUI.Models;
 using WebUI.ViewModels;
-using Microsoft.AspNetCore.Cors;
 
 namespace WebUI.Controllers
 {
-    [EnableCors("all")]
     public class RolesController : Controller
     {
         RoleManager<IdentityRole> _roleManager;

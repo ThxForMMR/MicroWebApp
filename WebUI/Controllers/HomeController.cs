@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Cors;
 
 namespace WebUI.Controllers
 {
-    [EnableCors("all")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -25,12 +24,22 @@ namespace WebUI.Controllers
             return View();
         }
 
-        public IActionResult CityCreation()
+        public IActionResult AreaCreate()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult DistrictCreate()
+        {
+            return View();
+        }
+
+        public IActionResult CityCreate()
+        {
+            return View();
+        }
+
+        public IActionResult StreetCreate()
         {
             return View();
         }

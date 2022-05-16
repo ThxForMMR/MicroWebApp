@@ -12,6 +12,8 @@ using WebUI.Models;
 using WebUI.DBContexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebUI.Repository;
+using WebUI.Repository.Interfaces;
 
 namespace WebUI
 {
@@ -30,14 +32,21 @@ namespace WebUI
             services.AddDbContext<UserContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddCors(options => {
+        /*    services.AddCors(options => {
                 options.AddPolicy("all", policy => {
                     policy.AllowAnyHeader()
                         .AllowAnyOrigin()
                         .AllowAnyMethod();
                     //.AllowCredentials(); 
                 });
-            });
+            });*/
+
+            services.AddTransient<IAreaRepository, AreaRepository>();
+            services.AddTransient<IDistrictRepository, DistrictRepository>();
+            services.AddTransient<ICityRepository, CityRepository>();
+            services.AddTransient<IStreetRepository, StreetRepository>();
+            services.AddTransient<IHouseRepository, HouseRepository>();
+            services.AddTransient<ISpotRepository, SpotRepository>();
 
             services.AddIdentity<User, IdentityRole>(opts => {
                 opts.Password.RequiredLength = 3;   // минимальная длина
@@ -49,6 +58,7 @@ namespace WebUI
                 .AddEntityFrameworkStores<UserContext>();
 
             services.AddControllersWithViews();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,11 +75,12 @@ namespace WebUI
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseCors("all");
+         //   app.UseCors("all");
             /*builder =>
                 builder.AllowAnyHeader()
                     .AllowAnyMethod()

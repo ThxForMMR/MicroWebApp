@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Менеджер улиц</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h2>Создание улицы</h2>
+    <form name="streetForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <label for="area">Область:</label>
+            <select class="form-control" name="area" id="1"></select>
+            <label for="district">Район:</label>
+            <select class="form-control" name="district" id="2"></select>
+            <label for="city">Город:</label>
+            <select class="form-control" name="city" id="3"></select>
+            <label for="name">Название улицы:</label>
+            <input class="form-control" name="name" />
+            <label for="type">Тип улицы:</label>
+            <input class="form-control" name="type" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+            <button type="reset" id="reset_btn" class="btn btn-primary">Сбросить</button>
+        </div>
+    </form>
+    <table id="data_table" class="table table-condensed table-striped  col-md-6">
+        <thead><tr><th>Id</th><th>Название</th><th></th></tr></thead>
+        <tbody id="tbody_data_table">
+        </tbody>
+    </table>
+    <script>
+        // Получение всех областей
+        async function GetAreas() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/area", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const areas = await response.json();
+                var selectArea = document.getElementById("1");
+
+                areas.forEach(area => {
+                    var option = document.createElement("option");
+                    option.text = area.areaName;
+                    option.value = area.id;
+                    selectArea.add(option);
+                });
+            }
+        }
+
+        // Получение районов области
+        async function GetDistrictByAreaId(id) {
+            const response = await fetch("/api/district/AreaId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const districts = await response.json();
+                var selectDistrict = document.getElementById("2");
+
+                districts.forEach(district => {
+                    var option = document.createElement("option");
+                    option.text = district.districtName;
+                    option.value = district.id;
+                    selectDistrict.add(option);
+                });
+            }
+        }
+
+        // Получение городов по району
+        async function GetCitiesByDistrictId(id) {
+            const response = await fetch("/api/city/DistrictId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const cities = await response.json();
+                var selectCity = document.getElementById("3");
+
+                cities.forEach(city => {
+                    var option = document.createElement("option");
+                    option.text = city.cityType + " " + city.cityName + " (" + city.cityCategory + ")";
+                    option.value = city.id;
+                    selectCity.add(option);
+                });
+            }
+        }
+
+        async function GetStreetsByCityId(id) {
+            const response = await fetch("/api/street/CityId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const streets = await response.json();
+                let rows = document.querySelector("tbody");
+                streets.forEach(street => {
+                    // добавляем полученные элементы в таблицу
+                    rows.append(row(street));
+                });
+            }
+        }
+
+        // Получение одного города
+        async function GetStreet(id) {
+            const response = await fetch("/api/street/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const street = await response.json();
+
+                const form = document.forms["streetForm"];
+
+                form.elements["id"].value = street.id;
+                form.elements["name"].value = street.streetName;
+                form.elements["type"].value = street.streetType;
+            }
+        }
+
+        // Добавление
+        async function CreateStreet(city_id, name, type) {
+            const response = await fetch("/api/street", {
+                method: "POST",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    streetName: name,
+                    streetType: type,
+                    cityId: parseInt(city_id, 10)
+                })
+            });
+
+            if (response.ok === true) {
+                const street = await response.json();
+                reset();
+                document.querySelector("tbody").append(row(street));
+            }
+        }
+        // Изменение
+        async function EditStreet(street_id, city_id, name, type) {
+            const response = await fetch("/api/street", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: parseInt(street_id, 10),
+                    streetName: name,
+                    streetType: type,
+                    cityId: parseInt(city_id, 10)
+                })
+            });
+            if (response.ok === true) {
+                const street = await response.json();
+                reset();
+                document.querySelector("tr[data-rowid='" + street.id + "']").replaceWith(row(street));
+            }
+        }
+
+        // Удаление
+        async function DeleteStreet(id) {
+            const response = await fetch("/api/street/" + id, {
+                method: "DELETE",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                document.querySelector("tr[data-rowid='" + id + "']").remove();
+            }
+        }
+
+        // создание строки для таблицы
+        function row(street) {
+
+            const tr = document.createElement("tr");
+            tr.setAttribute("data-rowid", street.id);
+
+            const idTd = document.createElement("td");
+            idTd.append(street.id);
+            tr.append(idTd);
+
+            const nameTd = document.createElement("td");
+            nameTd.append(street.streetType + " " + street.streetName);
+            tr.append(nameTd);
+
+            const linksTd = document.createElement("td");
+
+            const editLink = document.createElement("a");
+            editLink.setAttribute("data-id", street.id);
+            editLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            editLink.append("Изменить");
+            editLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                GetStreet(street.id);
+            });
+            linksTd.append(editLink);
+
+            const removeLink = document.createElement("a");
+            removeLink.setAttribute("data-id", street.id);
+            removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
+            removeLink.append("Удалить");
+            removeLink.addEventListener("click", e => {
+
+                e.preventDefault();
+                DeleteStreet(street.id);
+            });
+
+            linksTd.append(removeLink);
+            tr.appendChild(linksTd);
+
+            return tr;
+        }
+
+        // сброс формы
+        function reset() {
+            const form = document.forms["streetForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        // сброс значений формы
+        document.forms["streetForm"].addEventListener("reset_btn", e => {
+            e.preventDefault();
+            reset();
+            clearTable();
+        })
+
+
+        // отправка формы
+        document.forms["streetForm"].addEventListener("submit", e => {
+            e.preventDefault();
+
+            const form = document.forms["streetForm"];
+
+            const id = form.elements["id"].value;
+            const city_id = form.elements["city"].value;
+            const name = form.elements["name"].value;
+            const type = form.elements["type"].value;
+
+            if (id == 0)
+                CreateStreet(city_id, name, type);
+            else
+                EditStreet(id, city_id, name, type);
+        });
+
+        //очистка таблицы
+        function clearTable() {
+            const table = document.getElementById("data_table");
+
+            const new_tbody = document.createElement('tbody');
+            new_tbody.setAttribute('id', "tbody_data_table");
+
+            const old_tbody = document.getElementById("tbody_data_table");
+
+            table.replaceChild(new_tbody, old_tbody);
+        }
+
+        function clearSelect(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for (i = L; i >= 0; i--) {
+                selectElement.remove(i);
+            }
+        }
+        // загрузка областей
+        GetAreas();
+
+        // обновление районов после выбора области
+        document.getElementById("1").addEventListener('change', (event) => {
+            clearSelect(document.getElementById("2"));
+            GetDistrictByAreaId(event.target.value);
+        })
+
+        // обновление городов после выбора района
+        document.getElementById("2").addEventListener('change', (event) => {
+            clearSelect(document.getElementById("3"));
+            GetCitiesByDistrictId(event.target.value);
+        })
+
+        // обновление таблицы после выбора улицы
+        document.getElementById("3").addEventListener('change', (event) => {
+            clearTable();
+            GetStreetsByCityId(event.target.value);
+        })
+
+    </script>
+</body>
+</html>
