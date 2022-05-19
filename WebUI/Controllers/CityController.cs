@@ -66,36 +66,39 @@ namespace WebUI.Controllers
             return new NoContentResult();
         }
 
-        [HttpPut("bind/{spotId}")]
-        public IActionResult Put(long spotId, [FromBody] long[] ids)
+        /*   [HttpPut("bind/{spotId}")]
+           public IActionResult Put(long spotId, [FromBody] long[] ids)
+           {
+               if (ids == null) return new NoContentResult();
+               using (var scope = new TransactionScope())
+               {
+
+                   cityRepository.BindCities(spotId, ids);
+                   scope.Complete();
+                   return new OkResult();
+               }
+           } */
+
+        [HttpPut("bind")]
+        public IActionResult Put([FromBody] BindClass bindClass)
         {
-            if (ids == null) return new NoContentResult();
+            if (bindClass.Ids == null) return new NoContentResult();
             using (var scope = new TransactionScope())
             {
-                /*foreach (long id in ids)
-                {
-                    var city = cityRepository.GetCityById(id);
-                    city.SpotId = spotId;
-                    cityRepository.UpdateCity(city);
-                }     */
-                cityRepository.BindCities(spotId, ids);
+
+                cityRepository.BindCities(bindClass.SpotId, bindClass.Ids);
                 scope.Complete();
                 return new OkResult();
             }
         }
+
         [HttpPut("unbind")]
-        public IActionResult Put([FromBody] long[] ids)
+        public IActionResult Put([FromBody] UnbindClass unbindClass)
         {
-            if (ids == null) return new NoContentResult();
+            if (unbindClass.Ids == null) return new NoContentResult();
             using (var scope = new TransactionScope())
             {
-                /*  foreach (long id in ids)
-                  {
-                      var city = cityRepository.GetCityById(id);
-                      city.SpotId = null;
-                      cityRepository.UpdateCity(city);
-                  }*/
-                cityRepository.UnbindCities(ids);
+                cityRepository.UnbindCities(unbindClass.Ids);
                 scope.Complete();
                 return new OkResult();
             }

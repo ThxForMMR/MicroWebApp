@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>Менеджер городов</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/table.css" />
 </head>
 <body>
     <h2>Создание города</h2>
@@ -12,11 +13,15 @@
         <input type="hidden" name="id" value="0" />
         <div class="form-group col-md-5">
             <label for="area">Область:</label>
-            <select class="form-control" name="area" id="1"></select>
+            <select class="form-control" name="area" id="1">
+                <option value="none" selected disabled hidden>Выбрать область</option>
+            </select>
             <label for="district">Район:</label>
-            <select class="form-control" name="district" id="2"></select>
+            <select class="form-control" name="district" id="2">
+                <option value="none" selected disabled hidden>Выбрать район</option>
+            </select>
             <label for="name">Название:</label>
-            <input class="form-control" name="name" />
+            <input class="form-control" name="name" required />
             <label for="type">Тип:</label>
             <input class="form-control" name="type" />
             <label for="category">Категория(сельсовет):</label>
@@ -27,11 +32,14 @@
             <button type="reset" id="reset_btn" class="btn btn-primary">Сбросить</button>
         </div>
     </form>
+
     <table id="data_table" class="table table-condensed table-striped  col-md-6">
         <thead><tr><th>Id</th><th>Название</th><th></th></tr></thead>
         <tbody id="tbody_data_table">
         </tbody>
     </table>
+
+
     <script>
         // Получение всех областей
         async function GetAreas() {
@@ -205,13 +213,14 @@
             const form = document.forms["cityForm"];
             form.reset();
             form.elements["id"].value = 0;
+            clearSelect("1");
+            clearSelect("2");
         }
 
         // сброс значений формы
-        document.forms["cityForm"].addEventListener("reset_btn", e => {
+        document.forms["cityForm"].addEventListener("reset", e => {
             e.preventDefault();
             reset();
-            clearTable();
         })
 
 
@@ -223,7 +232,7 @@
 
             const id = form.elements["id"].value;
             const district_id = form.elements["district"].value;
-            const name = form.elements["name"].value;            
+            const name = form.elements["name"].value;
             const type = form.elements["type"].value;
             const category = form.elements["category"].value;
 
@@ -231,7 +240,7 @@
                 CreateCity(district_id, name, type, category);
             else
                 EditCity(id, district_id, name, type, category);
-        });        
+        });
 
         //очистка таблицы
         function clearTable() {
@@ -248,10 +257,11 @@
         function clearSelect(selectElement) {
             var i, L = selectElement.options.length - 1;
             for (i = L; i >= 0; i--) {
+                if (selectElement.value == "none") continue;
                 selectElement.remove(i);
             }
         }
-        // загрузка областей 
+        // загрузка областей
         GetAreas();
 
         // обновление районов после выбора области

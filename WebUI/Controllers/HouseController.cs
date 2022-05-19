@@ -66,6 +66,31 @@ namespace WebUI.Controllers
             return new NoContentResult();
         }
 
+        [HttpPut("bind")]
+        public IActionResult Put([FromBody] BindClass bindClass)
+        {
+            if (bindClass.Ids == null) return new NoContentResult();
+            using (var scope = new TransactionScope())
+            {
+
+                houseRepository.BindHouse(bindClass.SpotId, bindClass.Ids);
+                scope.Complete();
+                return new OkResult();
+            }
+        }
+
+        [HttpPut("unbind")]
+        public IActionResult Put([FromBody] UnbindClass unbindClass)
+        {
+            if (unbindClass.Ids == null) return new NoContentResult();
+            using (var scope = new TransactionScope())
+            {
+                houseRepository.UnbindHouse(unbindClass.Ids);
+                scope.Complete();
+                return new OkResult();
+            }
+        }
+
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {

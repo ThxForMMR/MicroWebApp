@@ -5,27 +5,32 @@
     <meta name="viewport" content="width=device-width" />
     <title>Менеджер областей</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/table.css" />
 </head>
 <body>
     <h2>Создание области</h2>
-    <form name="areaForm">
-        <input type="hidden" name="id" value="0" />
-        <div class="form-group col-md-5">
-            <label for="name">Название:</label>
-            <input class="form-control" name="name" />
-        </div>
-        <div class="panel-body">
-            <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
-            <button type="reset" id="reset_btn" class="btn btn-primary">Сбросить</button>
-        </div>
-    </form>
+    <div class="my-custom-form">
+        <form name="areaForm" class="form-group">
+            <input type="hidden" name="id" value="0" />
+            <div class="form-group col-md-5">
+                <label for="name">Название:</label>
+                <input required class="form-control" name="name" />
+            </div>
+            <div class="panel-body">
+                <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
+                <button type="reset" id="reset_btn" class="btn btn-primary">Сбросить</button>
+            </div>
+        </form>
+    </div>
+
     <table class="table table-condensed table-striped  col-md-6">
         <thead><tr><th>Id</th><th>Название</th><th></th></tr></thead>
         <tbody>
         </tbody>
     </table>
+
     <script>
-        // Получение всех 
+        // Получение всех
         async function GetAreas() {
             // отправляет запрос и получаем ответ
             const response = await fetch("/api/area", {
@@ -43,7 +48,7 @@
                 });
             }
         }
-        // Получение одного 
+        // Получение одного
         async function GetArea(id) {
             const response = await fetch("/api/area/" + id, {
                 method: "GET",
@@ -56,7 +61,7 @@
                 form.elements["name"].value = area.areaName;
             }
         }
-        // Добавление 
+        // Добавление
         async function CreateArea(Name) {
             const response = await fetch("/api/area", {
                 method: "POST",
@@ -71,7 +76,7 @@
                 document.querySelector("tbody").append(row(area));
             }
         }
-        // Изменение 
+        // Изменение
         async function EditArea(areaId, Name) {
             const response = await fetch("/api/area", {
                 method: "PUT",
@@ -87,7 +92,7 @@
                 document.querySelector("tr[data-rowid='" + area.id + "']").replaceWith(row(area));
             }
         }
-        // Удаление 
+        // Удаление
         async function DeleteArea(id) {
             const response = await fetch("/api/area/" + id, {
                 method: "DELETE",

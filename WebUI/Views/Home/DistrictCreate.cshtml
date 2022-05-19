@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>Менеджер районов</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/table.css" />
 </head>
 <body>
     <h2>Создание района</h2>
@@ -12,9 +13,11 @@
         <input type="hidden" name="id" value="0" />
         <div class="form-group col-md-5">
             <label for="area">Область:</label>
-            <select class="form-control" name="area" id="1"></select>
+            <select class="form-control" name="area" id="1">
+                <option value="none" selected disabled hidden>Выбрать область</option>
+            </select>
             <label for="name">Название:</label>
-            <input class="form-control" name="name" />
+            <input class="form-control" name="name" required/>
         </div>
         <div class="panel-body">
             <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
@@ -171,13 +174,13 @@
             const form = document.forms["districtForm"];
             form.reset();
             form.elements["id"].value = 0;
+            clearSelect("1");
         }
 
         // кнопка сброса значений формы
-        document.forms["districtForm"].addEventListener("reset_btn", e => {
+        document.forms["districtForm"].addEventListener("reset", e => {
             e.preventDefault();
             reset();
-            clearTable();
         })
 
         // отправка формы

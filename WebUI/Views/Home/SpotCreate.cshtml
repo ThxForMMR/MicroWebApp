@@ -3,13 +3,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Менеджер улиц</title>
+    <title>Менеджер участков</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/table.css" />
 </head>
 <body>
-    <h2>Создание улицы</h2>
-    <form name="streetForm">
+    <h2>Создание участка</h2>
+    <form name="spotForm">
         <input type="hidden" name="id" value="0" />
         <div class="form-group col-md-5">
             <label for="area">Область:</label>
@@ -24,10 +24,19 @@
             <select class="form-control" name="city" id="3">
                 <option value="none" selected disabled hidden>Выбрать город</option>
             </select>
-            <label for="name">Название улицы:</label>
+
+            <label for="name">Название участка:</label>
             <input class="form-control" name="name" required/>
-            <label for="type">Тип улицы:</label>
-            <input class="form-control" name="type" />
+            <label for="phone">Номер телефона:</label>
+            <input class="form-control" name="phone" />
+            <label for="address">Адрес:</label>
+            <input class="form-control" name="address" />
+            <label for="info">Информация:</label>
+            <input class="form-control" name="info" />
+            <label for="coorX">Координата X:</label>
+            <input class="form-control" name="coorX" />
+            <label for="coorY">Координата Y:</label>
+            <input class="form-control" name="coorY" />
         </div>
         <div class="panel-body">
             <button type="submit" id="submit" class="btn btn-primary">Сохранить</button>
@@ -100,78 +109,93 @@
             }
         }
 
-        async function GetStreetsByCityId(id) {
-            const response = await fetch("/api/street/CityId/" + id, {
+        //Участки в таблицу
+        async function GetSpotsByCityId(id) {
+            const response = await fetch("/api/spot/CityId/" + id, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
             if (response.ok === true) {
-                const streets = await response.json();
+                const spots = await response.json();
                 let rows = document.querySelector("tbody");
-                streets.forEach(street => {
+                spots.forEach(spot => {
                     // добавляем полученные элементы в таблицу
-                    rows.append(row(street));
+                    rows.append(row(spot));
                 });
             }
         }
 
-        // Получение одного города
-        async function GetStreet(id) {
-            const response = await fetch("/api/street/" + id, {
+        // Получение одного участка
+        async function GetSpot(id) {
+            const response = await fetch("/api/spot/" + id, {
                 method: "GET",
                 headers: { "Accept": "application/json" }
             });
             if (response.ok === true) {
-                const street = await response.json();
+                const spot = await response.json();
 
-                const form = document.forms["streetForm"];
+                const form = document.forms["spotForm"];
 
-                form.elements["id"].value = street.id;
-                form.elements["name"].value = street.streetName;
-                form.elements["type"].value = street.streetType;
+                form.elements["id"].value = spot.id;
+                form.elements["name"].value = spot.spotName;
+                form.elements["phone"].value = spot.phoneNumber;
+                form.elements["info"].value = spot.information;
+                form.elements["address"].value = spot.address;
+                form.elements["coorX"].value = spot.pointX;
+                form.elements["coorY"].value = spot.pointY;
             }
         }
 
         // Добавление
-        async function CreateStreet(city_id, name, type) {
-            const response = await fetch("/api/street", {
+        async function CreateSpot(city_id, district_id, name, phone, info, addrss, coorX, coorY) {
+            const response = await fetch("/api/spot", {
                 method: "POST",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    streetName: name,
-                    streetType: type,
-                    cityId: parseInt(city_id, 10)
+                    spotName: name,
+                    phoneNumber: phone,
+                    information: info,
+                    pointX: coorX,
+                    pointY: coorY,
+                    address: addrss,
+                    cityId: parseInt(city_id, 10),
+                    districtId: parseInt(district_id, 10)
                 })
             });
 
             if (response.ok === true) {
-                const street = await response.json();
+                const spot = await response.json();
                 reset();
-                document.querySelector("tbody").append(row(street));
+                document.querySelector("tbody").append(row(spot));
             }
         }
         // Изменение
-        async function EditStreet(street_id, city_id, name, type) {
-            const response = await fetch("/api/street", {
+        async function EditSpot(spot_id, city_id, district_id, name, phone, info, addrss, coorX, coorY) {
+            const response = await fetch("/api/spot", {
                 method: "PUT",
                 headers: { "Accept": "application/json", "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    id: parseInt(street_id, 10),
-                    streetName: name,
-                    streetType: type,
-                    cityId: parseInt(city_id, 10)
+                    id: parseInt(spot_id, 10),
+                    spotName: name,
+                    phoneNumber: phone,
+                    information: info,
+                    pointX: coorX,
+                    pointY: coorY,
+                    address: addrss,
+                    cityId: parseInt(city_id, 10),
+                    districtId: parseInt(district_id, 10)
                 })
             });
             if (response.ok === true) {
-                const street = await response.json();
+                const spot = await response.json();
                 reset();
-                document.querySelector("tr[data-rowid='" + street.id + "']").replaceWith(row(street));
+                document.querySelector("tr[data-rowid='" + spot.id + "']").replaceWith(row(spot));
             }
         }
 
         // Удаление
-        async function DeleteStreet(id) {
-            const response = await fetch("/api/street/" + id, {
+        async function DeleteSpot(id) {
+            const response = await fetch("/api/spot/" + id, {
                 method: "DELETE",
                 headers: { "Accept": "application/json" }
             });
@@ -181,40 +205,40 @@
         }
 
         // создание строки для таблицы
-        function row(street) {
+        function row(spot) {
 
             const tr = document.createElement("tr");
-            tr.setAttribute("data-rowid", street.id);
+            tr.setAttribute("data-rowid", spot.id);
 
             const idTd = document.createElement("td");
-            idTd.append(street.id);
+            idTd.append(spot.id);
             tr.append(idTd);
 
             const nameTd = document.createElement("td");
-            nameTd.append(street.streetType + " " + street.streetName);
+            nameTd.append(spot.spotName);
             tr.append(nameTd);
 
             const linksTd = document.createElement("td");
 
             const editLink = document.createElement("a");
-            editLink.setAttribute("data-id", street.id);
+            editLink.setAttribute("data-id", spot.id);
             editLink.setAttribute("style", "cursor:pointer;padding:15px;");
             editLink.append("Изменить");
             editLink.addEventListener("click", e => {
 
                 e.preventDefault();
-                GetStreet(street.id);
+                GetSpot(spot.id);
             });
             linksTd.append(editLink);
 
             const removeLink = document.createElement("a");
-            removeLink.setAttribute("data-id", street.id);
+            removeLink.setAttribute("data-id", spot.id);
             removeLink.setAttribute("style", "cursor:pointer;padding:15px;");
             removeLink.append("Удалить");
             removeLink.addEventListener("click", e => {
 
                 e.preventDefault();
-                DeleteStreet(street.id);
+                DeleteSpot(spot.id);
             });
 
             linksTd.append(removeLink);
@@ -225,7 +249,7 @@
 
         // сброс формы
         function reset() {
-            const form = document.forms["streetForm"];
+            const form = document.forms["spotForm"];
             form.reset();
             form.elements["id"].value = 0;
             clearSelect("1");
@@ -234,27 +258,33 @@
         }
 
         // сброс значений формы
-        document.forms["streetForm"].addEventListener("reset", e => {
+        document.forms["spotForm"].addEventListener("reset", e => {
             e.preventDefault();
             reset();
         })
 
 
         // отправка формы
-        document.forms["streetForm"].addEventListener("submit", e => {
+        document.forms["spotForm"].addEventListener("submit", e => {
             e.preventDefault();
 
-            const form = document.forms["streetForm"];
+            const form = document.forms["spotForm"];
 
-            const id = form.elements["id"].value;
-            const city_id = form.elements["city"].value;
             const name = form.elements["name"].value;
-            const type = form.elements["type"].value;
+            const phone = form.elements["phone"].value;
+            const info = form.elements["info"].value;
+            const address = form.elements["address"].value;
+            const coorX = form.elements["coorX"].value;
+            const coorY = form.elements["coorY"].value;
 
-            if (id == 0)
-                CreateStreet(city_id, name, type);
+            const spot_id = form.elements["id"].value;
+            const city_id = form.elements["city"].value;
+            const district_id = form.elements["district"].value;
+
+            if (spot_id == 0)
+                CreateSpot(city_id, district_id, name, phone, info, address, coorX, coorY);
             else
-                EditStreet(id, city_id, name, type);
+                EditSpot(spot_id, city_id, district_id, name, phone, info, address, coorX, coorY);
         });
 
         //очистка таблицы
@@ -291,10 +321,10 @@
             GetCitiesByDistrictId(event.target.value);
         })
 
-        // обновление таблицы после выбора улицы
+        // обновление таблицы после выбора города
         document.getElementById("3").addEventListener('change', (event) => {
             clearTable();
-            GetStreetsByCityId(event.target.value);
+            GetSpotsByCityId(event.target.value);
         })
 
     </script>

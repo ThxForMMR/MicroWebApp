@@ -1,0 +1,276 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Менеджер участков</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <h2>Привязка к участку</h2>
+    <form name="bindForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group col-md-5">
+            <label for="area">Область:</label>
+            <select class="form-control" name="area" id="1">
+                <option value="none" selected disabled hidden>Выбрать область</option>
+            </select>
+            <label for="district">Район:</label>
+            <select class="form-control" name="district" id="2">
+                <option value="none" selected disabled hidden>Выбрать район</option>
+            </select>
+            <label for="city">Город:</label>
+            <select class="form-control" name="city" id="3" multiple>
+                <option value="none" selected disabled hidden>Выбрать город</option>
+            </select>
+            <label for="street">Улица:</label>
+            <select class="form-control" name="street" id="4">
+                <option value="none" selected disabled hidden>Выбрать улицу</option>
+            </select>
+            <label for="house">Дом:</label>
+            <select class="form-control" name="house" id="5" multiple>
+                <option value="none" selected disabled hidden>Выбрать дом</option>
+            </select>
+            <label for="spot">Участок:</label>
+            <select required class="form-control" name="spot" id="6">
+                <option value="none" selected disabled hidden>Выбрать участок</option>
+            </select>
+        </div>
+        <div class="panel-body">
+            <button type="submit" id="submit_city" class="btn btn-primary">Привязать города</button>
+            <button type="submit" id="submit_house" class="btn btn-primary">Привязать дома</button>
+        </div>
+    </form>
+
+    <script>
+        // Получение всех областей
+        async function GetAreas() {
+            // отправляет запрос и получаем ответ
+            const response = await fetch("/api/area", {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            // если запрос прошел нормально
+            if (response.ok === true) {
+                // получаем данные
+                const areas = await response.json();
+                var selectArea = document.getElementById("1");
+
+                areas.forEach(area => {
+                    var option = document.createElement("option");
+                    option.text = area.areaName;
+                    option.value = area.id;
+                    selectArea.add(option);
+                });
+            }
+        }
+
+        // Получение районов области
+        async function GetDistrictByAreaId(id) {
+            const response = await fetch("/api/district/AreaId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const districts = await response.json();
+                var selectDistrict = document.getElementById("2");
+
+                districts.forEach(district => {
+                    var option = document.createElement("option");
+                    option.text = district.districtName;
+                    option.value = district.id;
+                    selectDistrict.add(option);
+                });
+            }
+        }
+
+        // Получение городов по району
+        async function GetCitiesByDistrictId(id) {
+            const response = await fetch("/api/city/DistrictId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const cities = await response.json();
+                var selectCity = document.getElementById("3");
+
+                cities.forEach(city => {
+                    var option = document.createElement("option");
+                    option.text = city.cityType + " " + city.cityName + " (" + city.cityCategory + ")";
+                    option.value = city.id;
+                    selectCity.add(option);
+                });
+            }
+        }
+
+        async function GetSpotsByDistrictId(id) {
+            const response = await fetch("/api/spot/DistrictId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const spots = await response.json();
+                var selectSpot = document.getElementById("6");
+
+                spots.forEach(spot => {
+                    var option = document.createElement("option");
+                    option.text = spot.spotName;
+                    option.value = spot.id;
+                    selectSpot.add(option);
+                });
+            }
+        }
+
+        async function GetStreetsByCityId(id) {
+            const response = await fetch("/api/street/CityId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const streets = await response.json();
+                var selectStreet = document.getElementById("4");
+
+                streets.forEach(street => {
+                    var option = document.createElement("option");
+                    option.text = street.streetType + " " + street.streetName;
+                    option.value = street.id;
+                    selectStreet.add(option);
+                });
+            }
+        }
+
+        async function GetHousesByStreetId(id) {
+            const response = await fetch("/api/house/StreetId/" + id, {
+                method: "GET",
+                headers: { "Accept": "application/json" }
+            });
+            if (response.ok === true) {
+                const houses = await response.json();
+                var selectHouse = document.getElementById("5");
+
+                houses.forEach(house => {
+                    var option = document.createElement("option");
+                    option.text = house.houseNumber;
+                    option.value = house.id;
+                    selectHouse.add(option);
+                });
+            }
+        }
+
+        async function BindCity(spot_id, cities_id) {
+            const response = await fetch("/api/city/bind", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    spotId: parseInt(spot_id,10),
+                    ids: cities_id
+                })
+            });
+            if (response.ok === true) {
+                alert("Города успешно привязаны!");
+            }
+            else {
+                alert(response.status);
+            }
+        }
+
+        async function BindHouse(spot_id, house_id) {
+            const response = await fetch("/api/house/bind", {
+                method: "PUT",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    spotId: parseInt(spot_id, 10),
+                    ids: house_id
+                })
+            });
+            if (response.ok === true) {
+                alert("Дома успешно привязаны!");
+            }
+            else {
+                alert(response.status);
+            }
+        }
+
+        // сброс формы
+        function reset() {
+            const form = document.forms["bindForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        // отправка 
+        document.getElementById("submit_city").addEventListener('click', e => {
+            e.preventDefault();
+
+            const form = document.forms["bindForm"];
+
+            const spot_id = form.elements["spot"].value;
+
+            var selected = [];
+            for (var option of form.elements["city"].options) {
+                if (option.selected) {
+                    selected.push(option.value);
+                }
+            }
+
+            BindCity(spot_id, selected);
+        });
+
+        // отправка 
+        document.getElementById("submit_house").addEventListener('click', e => {
+            e.preventDefault();
+
+            const form = document.forms["bindForm"];
+
+            const spot_id = form.elements["spot"].value;
+
+            var selected = [];
+            for (var option of form.elements["house"].options) {
+                if (option.selected) {
+                    selected.push(option.value);
+                }
+            }
+
+            BindHouse(spot_id, selected);
+        });
+
+
+        function clearSelect(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for (i = L; i >= 0; i--) {
+                if (selectElement.value == "none") continue;
+                selectElement.remove(i);
+            }
+        }
+        // загрузка областей
+        GetAreas();
+
+        // обновление районов после выбора области
+        document.getElementById("1").addEventListener('change', (event) => {
+            clearSelect(document.getElementById("2"));
+            GetDistrictByAreaId(event.target.value);
+        })
+
+        // обновление городов после выбора района и обновление участков
+        document.getElementById("2").addEventListener('change', (event) => {
+            clearSelect(document.getElementById("3"));
+            clearSelect(document.getElementById("6"));
+
+            GetCitiesByDistrictId(event.target.value);
+            GetSpotsByDistrictId(event.target.value);
+        })
+
+        // обновление улиц
+        document.getElementById("3").addEventListener('change', (event) => {
+            clearSelect(document.getElementById("4"));
+            GetStreetsByCityId(event.target.value);
+        })
+
+        // обновление домов
+        document.getElementById("4").addEventListener('change', (event) => {
+            clearSelect(document.getElementById("5"));
+            GetHousesByStreetId(event.target.value);
+        })
+    </script>
+</body>
+</html>

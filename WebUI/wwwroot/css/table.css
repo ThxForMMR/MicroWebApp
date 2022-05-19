@@ -1,0 +1,19 @@
+﻿table {
+    display: block;
+    position: relative;
+    height: 600px;
+    float: right;
+    width: 50%;
+    max-width: 410px;
+    overflow: auto;
+}
+
+form {
+    float: left;
+    width: 50%;
+    max-width: 500px;
+}
+
+.form-control {
+    min-width: 500px;
+}

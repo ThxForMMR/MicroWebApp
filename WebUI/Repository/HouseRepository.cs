@@ -54,5 +54,25 @@ namespace WebUI.Repository
             _dbContext.Houses.Update(house);
             Save();
         }
+
+        public void BindHouse(long spotId, long[] ids)
+        {
+            foreach (long id in ids)
+            {
+                var house = GetHouseById(id);
+                house.SpotId = spotId;
+                UpdateHouse(house);
+            }
+        }
+
+        public void UnbindHouse(long[] ids)
+        {
+            foreach (long id in ids)
+            {
+                var house = GetHouseById(id);
+                house.SpotId = null;
+                UpdateHouse(house);
+            }
+        }
     }
 }

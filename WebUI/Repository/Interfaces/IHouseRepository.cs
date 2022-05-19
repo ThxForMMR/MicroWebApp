@@ -14,5 +14,7 @@ namespace WebUI.Repository.Interfaces
         void InsertHouse(House house);
         void DeleteHouse(long houseId);
         void UpdateHouse(House house);
+        void BindHouse(long id, long[] ids);
+        void UnbindHouse(long[] ids);
     }
 }
