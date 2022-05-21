@@ -66,19 +66,6 @@ namespace WebUI.Controllers
             return new NoContentResult();
         }
 
-        /*   [HttpPut("bind/{spotId}")]
-           public IActionResult Put(long spotId, [FromBody] long[] ids)
-           {
-               if (ids == null) return new NoContentResult();
-               using (var scope = new TransactionScope())
-               {
-
-                   cityRepository.BindCities(spotId, ids);
-                   scope.Complete();
-                   return new OkResult();
-               }
-           } */
-
         [HttpPut("bind")]
         public IActionResult Put([FromBody] BindClass bindClass)
         {
