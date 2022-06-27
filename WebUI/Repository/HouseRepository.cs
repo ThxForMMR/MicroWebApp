@@ -40,6 +40,7 @@ namespace WebUI.Repository
 
         public void InsertHouse(House house)
         {
+            house.CreatedAt = DateTime.UtcNow;
             _dbContext.Houses.Add(house);
             Save();
         }
@@ -51,6 +52,7 @@ namespace WebUI.Repository
 
         public void UpdateHouse(House house)
         {
+            house.UpdateAt = DateTime.UtcNow;
             _dbContext.Houses.Update(house);
             Save();
         }

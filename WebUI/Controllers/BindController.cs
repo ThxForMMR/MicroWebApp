@@ -7,9 +7,12 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using WebUI.Models;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebUI.Controllers
 {
+    [Authorize(Roles = "admin")]
     public class BindController : Controller
     {
 

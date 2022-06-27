@@ -29,49 +29,51 @@
                         }
                         else
                         {
-                            <li class="nav-item">                                
-                                    <form class="nav-link text-dark" method="post" asp-controller="Account" asp-action="Logout">
-                                        <input  type="submit" value="@User.Identity.Name" />
-                                    </form>
-                                
+                            <li class="nav-item">
+                                <form method="post" asp-controller="Account" asp-action="Logout">
+                                    <input hidden value="@User.Identity.Name" />
+                                    <button type="submit" class="nav-link text-dark custom-button-like-link">@User.Identity.Name</button>
+                                </form>
                             </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
                             </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark" href="~/Roles/Index">Менеджер ролей</a>
                             </li>
+
+                            <li>
+                                <div class="nav-item dropdown">
+                                    <a class="nav-link text-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Менеджер
+                                    </a>
+
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="AreaCreate">Менеджер областей</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="DistrictCreate">Менеджер районов</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="CityCreate">Менеджер городов</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="StreetCreate">Менеджер улиц</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="HouseCreate">Менеджер домов</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="SpotCreate">Менеджер участков</a>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li>
+                                <div class="nav-item dropdown">
+                                    <a class="nav-link text-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink_2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Связи
+                                    </a>
+
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_2">
+                                        <a class="dropdown-item" asp-area="" asp-controller="Bind" asp-action="Bind">Привязка к участку</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Bind" asp-action="Unbind">Отвязка от участка</a>
+                                    </div>
+                                </div>
+                            </li>
                         }
-
-                        <li>
-                            <div class="nav-item dropdown">
-                                <a class="nav-link text-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Менеджер
-                                </a>
-
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="AreaCreate">Менеджер областей</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="DistrictCreate">Менеджер районов</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="CityCreate">Менеджер городов</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="StreetCreate">Менеджер улиц</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="HouseCreate">Менеджер домов</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="SpotCreate">Менеджер участков</a>
-                                </div>
-                            </div>
-                        </li>
-
-                        <li>
-                            <div class="nav-item dropdown">
-                                <a class="nav-link text-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink_2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Связи
-                                </a>
-
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink_2">
-                                    <a class="dropdown-item" asp-area="" asp-controller="Bind" asp-action="Bind">Привязка к участку</a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Bind" asp-action="Unbind">Отвязка от участка</a>
-                                </div>
-                            </div>
-                        </li>
                     </ul>
                 </div>
             </div>

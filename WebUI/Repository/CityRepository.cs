@@ -41,6 +41,7 @@ namespace WebUI.Repository
 
         public void InsertCity(City city)
         {
+            city.CreatedAt = DateTime.UtcNow;
             _dbContext.Cities.Add(city);
             Save();
         }
@@ -52,6 +53,7 @@ namespace WebUI.Repository
 
         public void UpdateCity(City city)
         {
+            city.UpdateAt = DateTime.UtcNow;
             _dbContext.Cities.Update(city);
             Save();
         }

@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WebUI.Models;
 using WebUI.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebUI.Controllers
 {
+    [Authorize(Roles = "super_admin")]
     public class RolesController : Controller
     {
         RoleManager<IdentityRole> _roleManager;

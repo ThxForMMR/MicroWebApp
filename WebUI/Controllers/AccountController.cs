@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using WebUI.Models;
 using WebUI.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebUI.Controllers
 {
@@ -17,11 +19,13 @@ namespace WebUI.Controllers
             _signInManager = signInManager;
         }
         [HttpGet]
+        [Authorize(Roles = "admin")]
         public IActionResult Register()
         {
             return View();
         }
         [HttpPost]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)

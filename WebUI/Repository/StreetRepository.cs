@@ -40,6 +40,7 @@ namespace WebUI.Repository
 
         public void InsertStreet(Street street)
         {
+            street.CreatedAt = DateTime.UtcNow;
             _dbContext.Streets.Add(street);
             Save();
         }
@@ -51,6 +52,7 @@ namespace WebUI.Repository
 
         public void UpdateStreet(Street street)
         {
+            street.UpdateAt = DateTime.UtcNow;
             _dbContext.Streets.Update(street);
             Save();
         }

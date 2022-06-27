@@ -38,6 +38,7 @@ namespace WebUI.Repository
 
         public void InsertArea(Area area)
         {
+            area.CreatedAt = DateTime.UtcNow;
             _dbContext.Areas.Add(area);
             Save();
         }
@@ -49,6 +50,7 @@ namespace WebUI.Repository
 
         public void UpdateArea(Area area)
         {
+            area.UpdateAt = DateTime.UtcNow;
             _dbContext.Areas.Update(area);
             Save();
         }

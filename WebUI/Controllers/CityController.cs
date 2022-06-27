@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using WebUI.Repository.Interfaces;
 using System.Transactions;
 using WebUI.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebUI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CityController : ControllerBase
     {
         private readonly ICityRepository cityRepository;

@@ -40,6 +40,7 @@ namespace WebUI.Repository
 
         public void InsertSpot(Spot spot)
         {
+            spot.CreatedAt = DateTime.UtcNow;
             _dbContext.Spots.Add(spot);
             Save();
         }
@@ -51,6 +52,7 @@ namespace WebUI.Repository
 
         public void UpdateSpot(Spot spot)
         {
+            spot.UpdateAt = DateTime.UtcNow;
             _dbContext.Spots.Update(spot);
             Save();
         }

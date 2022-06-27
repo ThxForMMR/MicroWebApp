@@ -4,39 +4,69 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Менеджер участков</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="~/css/table.css" />
 </head>
 <body>
-    <h2>Отвязка от участка</h2>
-    <form name="unbindForm">
-        <input type="hidden" name="id" value="0" />
-        <div class="form-group col-md-5">
-            <label for="area">Область:</label>
-            <select class="form-control" name="area" id="1">
-                <option value="none" selected disabled hidden>Выбрать область</option>
-            </select>
-            <label for="district">Район:</label>
-            <select class="form-control" name="district" id="2">
-                <option value="none" selected disabled hidden>Выбрать район</option>
-            </select>
-            <label for="spot">Участок:</label>
-            <select required class="form-control" name="spot" id="3">
-                <option value="none" selected disabled hidden>Выбрать участок</option>
-            </select>
-            <label for="city">Город:</label>
-            <select class="form-control" name="city" id="4" multiple>
-                <option value="none" selected disabled hidden>Выбрать город</option>
-            </select>
-            <label for="house">Дом:</label>
-            <select class="form-control" name="house" id="5" multiple>
-                <option value="none" selected disabled hidden>Выбрать дом</option>
-            </select>
+    <div class="wrapper">
+        <div class="content">
+            <div class="main">
+                <div class="container">
+                    <div class="main__raw">
+                        <div class="main__column main__form bind__form">
+                            <h2>Отвязка от участка</h2>
+                            <div id="liveAlertPlaceholder"></div>
+                            <form name="unbindForm" class="form-group needs-validation" novalidate>
+                                <input type="hidden" name="id" value="0" />
+                                <div class="form-group">
+                                    <label for="1">Область:</label>
+                                    <select required class="form-control" name="area" id="1">
+                                        <option value="" selected disabled hidden>Выбрать область</option>
+                                    </select>
+                                    <div class="invalid-feedback">Выберите область.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="2">Район:</label>
+                                    <select required class="form-control" name="district" id="2">
+                                        <option value="" selected disabled hidden>Выбрать район</option>
+                                    </select>
+                                    <div class="invalid-feedback">Выберите район.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="3">Участок:</label>
+                                    <select required class="form-control" name="spot" id="3">
+                                        <option value="" selected disabled hidden>Выбрать участок</option>
+                                    </select>
+                                    <div class="invalid-feedback">Выберите участок.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="4">Город:</label>
+                                    <select required class="form-control" name="city" id="4" multiple>
+                                        <option value="" selected disabled hidden>Выбрать город</option>
+                                    </select>
+                                    <div class="invalid-feedback">Выберите город.</div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="5">Дом:</label>
+                                    <select class="form-control" name="house" id="5" multiple>
+                                        <option value="" selected disabled hidden>Выбрать дом</option>
+                                    </select>
+                                    <div class="invalid-feedback">Выберите дом.</div>
+                                </div>
+
+                                <div class="panel-body">
+                                    <button type="submit" id="submit_city" class="btn btn-primary">Отвязать города</button>
+                                    <button type="submit" id="submit_house" class="btn btn-primary">Отвязать дома</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="panel-body">
-            <button type="submit" id="submit_city" class="btn btn-primary">Отвязать города</button>
-            <button type="submit" id="submit_house" class="btn btn-primary">Отвязать дома</button>
-        </div>
-    </form>
+    </div>
 
     <script>
         // Получение всех областей
@@ -144,12 +174,14 @@
                 })
             });
             if (response.ok === true) {
-                alert("Города успешно отвязаны!");
+                clear_alert("alert_id");
+                add_alert("Города успешно отвязаны!", "success", "alert_id");
                 clearSelect(document.getElementById("4"));
                 GetCitiesBySpotId(spot_id);
             }
             else {
-                alert(response.status);
+                clear_alert("alert_id");
+                add_alert("Произошла ошибка! Код: " + response.status + ". Обратитесь к специалисту.", "danger", "alert_id");
             }
         }
 
@@ -162,12 +194,14 @@
                 })
             });
             if (response.ok === true) {
-                alert("Дома успешно отвязаны!");
+                clear_alert("alert_id");
+                add_alert("Дома успешно отвязаны!", "success", "alert_id");
                 clearSelect(document.getElementById("5"));
                 GetHousesBySpotId(spot_id);
             }
             else {
-                alert(response.status);
+                clear_alert("alert_id");
+                add_alert("Произошла ошибка! Код: " + response.status + ". Обратитесь к специалисту.", "danger", "alert_id");
             }
         }
 
@@ -178,21 +212,44 @@
             form.elements["id"].value = 0;
         }
 
+        var alertPlaceholder = document.getElementById('liveAlertPlaceholder');
+
+        function add_alert(message, type, id) {
+            var wrapper = document.createElement('div')
+            wrapper.innerHTML = '<div id="' + id + '" class="alert alert-' + type + ' alert-dismissible" role="alert">' + message +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+
+            alertPlaceholder.append(wrapper)
+        }
+
+        function clear_alert(id) {
+            var alertNode = document.getElementById(id);
+
+            if (alertNode) {
+                var alert = new bootstrap.Alert(alertNode);
+                alert.close();
+            }
+        }
+
         // отправка
         document.getElementById("submit_city").addEventListener('click', e => {
             e.preventDefault();
 
             const form = document.forms["unbindForm"];
 
-            var selected = [];
-            for (var option of form.elements["city"].options) {
-                if (option.selected) {
-                    selected.push(option.value);
-                }
-            }
-            const spot_id = form.elements["spot"].value;
+            form.classList.add('was-validated');
 
-            UnbindCity(selected, spot_id);
+            if (form.checkValidity() !== false) {
+                var selected = [];
+                for (var option of form.elements["city"].options) {
+                    if (option.selected) {
+                        selected.push(option.value);
+                    }
+                }
+                const spot_id = form.elements["spot"].value;
+
+                UnbindCity(selected, spot_id);
+            }                       
         });
 
         // отправка
@@ -201,22 +258,26 @@
 
             const form = document.forms["unbindForm"];
 
-            var selected = [];
-            for (var option of form.elements["house"].options) {
-                if (option.selected) {
-                    selected.push(option.value);
-                }
-            }
-            const spot_id = form.elements["spot"].value;
+            form.classList.add('was-validated');
 
-            UnbindHouse(selected, spot_id);
+            if (form.checkValidity() !== false) {
+                var selected = [];
+                for (var option of form.elements["house"].options) {
+                    if (option.selected) {
+                        selected.push(option.value);
+                    }
+                }
+                const spot_id = form.elements["spot"].value;
+
+                UnbindHouse(selected, spot_id);
+            }            
         });
 
 
         function clearSelect(selectElement) {
             var i, L = selectElement.options.length - 1;
             for (i = L; i >= 0; i--) {
-                if (selectElement.value == "none") continue;
+                //if (selectElement.value == "") continue;
                 selectElement.remove(i);
             }
         }

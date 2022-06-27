@@ -41,6 +41,7 @@ namespace WebUI.Repository
 
         public void InsertDistrict(District district)
         {
+            district.CreatedAt = DateTime.UtcNow;
             _dbContext.Districts.Add(district);
             Save();
         }
@@ -52,6 +53,7 @@ namespace WebUI.Repository
 
         public void UpdateDistrict(District district)
         {
+            district.UpdateAt = DateTime.UtcNow;
             _dbContext.Districts.Update(district);
             Save();
         }

@@ -1,19 +1,94 @@
-﻿table {
-    display: block;
-    position: relative;
-    height: 600px;
-    float: right;
-    width: 50%;
-    max-width: 410px;
-    overflow: auto;
+﻿.wrapper {
+    min-height: 100%;
+    overflow: hidden;
 }
 
-form {
-    float: left;
-    width: 50%;
-    max-width: 500px;
+.container {
+    max-width: 1180px;
+    margin: 0px auto;
 }
 
-.form-control {
-    min-width: 500px;
+.content {
+    flex: 1 1 auto;
+}
+
+.main__raw {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.main__column {
+    flex: 1 1 45%;
+    background-color: #ffffff;
+}
+
+.main__form {
+    padding: 10px;
+    border: 1px solid #808080;
+    border-radius: 10px;
+    height: fit-content;
+    margin: 0 10px 10px 0;
+    box-shadow: 1px 1px 1px 1px;
+}
+
+.main__table {
+    max-height: fit-content;
+    border: 1px solid #808080;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 1px 1px 1px 1px;
+}
+
+.table-fixed {
+    overflow-y: auto;
+    height: fit-content;
+    max-height: 80vh;
+}
+
+.form-group {
+    width: auto;
+}
+
+thead {
+    position: sticky;
+    top: 0px;
+    background: #808080;
+}
+
+.bind__form {
+    margin: 0px auto;
+    max-width: 600px;
+}
+
+body {
+    background: white no-repeat center cover fixed;
+    background-image: url(https://picsum.photos/1024/768);
+    background-size: cover;
+    transition: all .5s ease-in;
+    animation: animBg 30s linear infinite;
+}
+
+/*Не уверен, что работает*/
+body::before {
+    content: url('https://i.picsum.photos/id/171/1024/768.jpg?hmac=_yLLr6cdgtDdIuddjWGO9Ci3_Enwm8iXTNV28hMRa-w') url('https://i.picsum.photos/id/631/1024/768.jpg?hmac=CbtPkeaVNgggpvzg7x2YGt1cCpNWKFTekTO63lLeA7Y') url('https://i.picsum.photos/id/443/1024/768.jpg?hmac=ebj0EvQ5DDEaWX_8LbT1xpqNz-qpqem9d3DmOgsbXlc');
+    display: none;
+}
+
+@keyframes animBg {
+    0%, 32% {
+        background-image: url('https://i.picsum.photos/id/171/1024/768.jpg?hmac=_yLLr6cdgtDdIuddjWGO9Ci3_Enwm8iXTNV28hMRa-w');
+    }
+
+    33%, 66% {
+        background-image: url('https://i.picsum.photos/id/631/1024/768.jpg?hmac=CbtPkeaVNgggpvzg7x2YGt1cCpNWKFTekTO63lLeA7Y');
+    }
+
+    67%, 99% {
+        background-image: url('https://i.picsum.photos/id/443/1024/768.jpg?hmac=ebj0EvQ5DDEaWX_8LbT1xpqNz-qpqem9d3DmOgsbXlc');
+    }
+
+    100% {
+        background-image: url('https://i.picsum.photos/id/171/1024/768.jpg?hmac=_yLLr6cdgtDdIuddjWGO9Ci3_Enwm8iXTNV28hMRa-w');
+    }
 }
